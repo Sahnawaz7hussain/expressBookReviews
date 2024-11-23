@@ -40,34 +40,98 @@ public_users.post("/register", (req, res) => {
 
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
-  return res.status(200).json({
-    books: books,
-    message: "Books fetched successfully!",
-    status: true,
+  let myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (books) {
+        resolve(books);
+      } else {
+        reject("No Books available!");
+      }
+    }, 1000);
   });
+  myPromise
+    .then((resp) => {
+      return res.status(200).json({
+        books: resp,
+        message: "Books fetched successfully!",
+        status: true,
+      });
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: err });
+    });
 });
 
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
   let isbn = req.params.isbn;
   //Write your code here
-  return res
-    .status(200)
-    .json({ book: books[isbn], message: "Book Details based on isbn!" });
+  let myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (books[isbn]) {
+        resolve(books[isbn]);
+      } else {
+        reject("No Book found with given ISBN");
+      }
+    }, 1000);
+  });
+
+  myPromise
+    .then((resp) => {
+      return res
+        .status(200)
+        .json({ book: resp, message: "Book Details based on isbn!" });
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: err });
+    });
 });
 
 // Get book details based on author
 public_users.get("/author/:author", function (req, res) {
   let author = req.params.author;
-  return res.status(200).json({ book: getBookDetailsByAuthor(author) });
+  let myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (typeof getBookDetailsByAuthor(author) === "object") {
+        resolve(getBookDetailsByAuthor(author));
+      } else {
+        console.log("inside else");
+        reject(`NO Book found!`);
+      }
+    }, 1000);
+  });
+  myPromise
+    .then((resp) => {
+      return res
+        .status(200)
+        .json({ book: resp, message: "Book Details based on author!" });
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: err, err: "err" });
+    });
 });
 
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
-  //Write your code here
-  return res
-    .status(200)
-    .json({ book: getBookDetailsByTitle(req.params.title) });
+  let title = req.params.title;
+  let myPromise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (typeof getBookDetailsByTitle(title) === "object") {
+        resolve(getBookDetailsByTitle(title));
+      } else {
+        reject("NO Book found!");
+      }
+    }, 1000);
+  });
+  myPromise
+    .then((resp) => {
+      return res
+        .status(200)
+        .json({ book: resp, message: "Book Details based on title!" });
+    })
+    .catch((err) => {
+      return res.status(404).json({ message: err });
+    });
 });
 
 //  Get book review
